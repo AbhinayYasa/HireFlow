@@ -1151,7 +1151,10 @@ if (newStatus !== application.status) {
         className="mt-6 space-y-4"
         onSubmit={async (e) => {
   e.preventDefault();
-    const { data: { user } } = await supabase.auth.getUser();
+
+  const form = e.currentTarget as HTMLFormElement;
+
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     setShowApplication(false);
@@ -1159,8 +1162,6 @@ if (newStatus !== application.status) {
     setShowSignIn(true);
     return;
   }
-
-  const form = e.currentTarget;
 
   const application = {
     id: Date.now(),
