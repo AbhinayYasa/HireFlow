@@ -100,10 +100,16 @@ const supabase = createClient();
 
 useEffect(() => {
   const fetchJobs = async () => {
+    console.log("🔵 Starting jobs fetch...");
+
     const { data, error } = await supabase
       .from("jobs")
       .select("*")
       .order("created_at", { ascending: false });
+
+    console.log("🟢 Jobs data:", data);
+    console.log("🔴 Jobs error:", error);
+    console.log("🟡 Jobs count:", data?.length);
 
     if (error) {
       console.error("Error fetching jobs:", error);
@@ -325,18 +331,25 @@ const sortedApplications = [...filteredApplications].sort((a, b) => {
           <div className="flex items-center gap-4">
            <button
   type="button"
-  onClick={() => {
-  setShowSignIn(true);
+ onClick={(e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  setShowSignUp(false);
+
+  setTimeout(() => {
+    setShowSignIn(true);
+  }, 0);
 }}
-  className="hidden text-sm text-[#555] transition hover:text-black sm:block"
+  className="relative z-50 cursor-pointer text-sm text-[#555] transition hover:text-black sm:block"
 >
   Sign in
 </button>
            <button
   type="button"
   onClick={() => {
-  setShowSignUp(false);
-  setShowSignIn(true);
+  setShowSignIn(false);
+  setShowSignUp(true);
 }}
   className="rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#333]"
 >
@@ -1081,7 +1094,16 @@ if (newStatus !== application.status) {
 </div>
       <div className="mt-6 flex justify-end gap-2">
   <button
-    onClick={() => {
+    onClick={async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    setShowApplication(false);
+    setShowSignUp(false);
+    setShowSignIn(true);
+    return;
+  }
+
   setShowApplication(true);
 }}
     className="rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#222]"
@@ -1127,8 +1149,16 @@ if (newStatus !== application.status) {
 
       <form
         className="mt-6 space-y-4"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
   e.preventDefault();
+    const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    setShowApplication(false);
+    setShowSignUp(false);
+    setShowSignIn(true);
+    return;
+  }
 
   const form = e.currentTarget;
 
@@ -1290,11 +1320,14 @@ if (newStatus !== application.status) {
           className="mt-7 rounded-lg bg-black px-7 py-3 text-sm font-medium text-white transition hover:bg-[#222]"
         >
           Done
-        </button>
+                </button>
 
       </div>
     </div>
-    {showSignIn && (
+  </div>
+)}
+
+{showSignIn && (
   <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4">
     <div className="relative z-[10000] w-full max-w-md rounded-2xl bg-white p-7 shadow-2xl">
       <div className="flex items-center justify-between">
@@ -1317,10 +1350,28 @@ if (newStatus !== application.status) {
       </div>
       <form
         className="mt-6 space-y-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setShowSignIn(false);
-        }}
+        onSubmit={async (e) => {
+  e.preventDefault();
+
+  const form = e.currentTarget;
+  const formData = new FormData(form);
+
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  setShowSignIn(false);
+  setShowApplication(true);
+}}
       >
         <div>
           <label className="text-sm font-medium text-[#444]">
@@ -1328,6 +1379,7 @@ if (newStatus !== application.status) {
           </label>
           <input
             type="email"
+            name="email"
             required
             placeholder="Enter your email"
             className="mt-1 w-full rounded-lg border border-black/10 px-3 py-2.5 text-sm outline-none focus:border-black/30"
@@ -1340,6 +1392,7 @@ if (newStatus !== application.status) {
           </label>
           <input
             type="password"
+            name="password"
             required
             placeholder="Enter your password"
             className="mt-1 w-full rounded-lg border border-black/10 px-3 py-2.5 text-sm outline-none focus:border-black/30"
@@ -1370,6 +1423,123 @@ if (newStatus !== application.status) {
     </div>
   </div>
 )}
+{showSignUp && (
+  <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4">
+    <div className="relative w-full max-w-md rounded-2xl bg-white p-7 shadow-2xl">
+
+      {/* Close button */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold text-[#111]">
+            Create your account
+          </h2>
+
+          <p className="mt-1 text-sm text-[#666]">
+            Sign up to continue to HireFlow.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowSignUp(false)}
+          className="rounded-full px-3 py-1 text-xl text-[#777] hover:bg-[#f5f5f5]"
+        >
+          ×
+        </button>
+      </div>
+
+      {/* Sign Up Form */}
+      <form
+        className="mt-6 space-y-4"
+       onSubmit={async (e) => {
+  e.preventDefault();
+
+  const form = e.currentTarget;
+  const formData = new FormData(form);
+
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  alert("Account created successfully! Please sign in.");
+
+  setShowSignUp(false);
+  setShowSignIn(true);
+}}
+      >
+        <div>
+          <label className="text-sm font-medium text-[#444]">
+            Full name
+          </label>
+
+          <input
+            type="text"
+            required
+            placeholder="Enter your name"
+            className="mt-1 w-full rounded-lg border border-black/10 px-3 py-2.5 text-sm outline-none focus:border-black"
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-[#444]">
+            Email
+          </label>
+
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="Enter your email"
+            className="mt-1 w-full rounded-lg border border-black/10 px-3 py-2.5 text-sm outline-none focus:border-black"
+          />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium text-[#444]">
+            Password
+          </label>
+
+          <input
+            type="password"
+            name="password"
+            required
+            placeholder="Create a password"
+            className="mt-1 w-full rounded-lg border border-black/10 px-3 py-2.5 text-sm outline-none focus:border-black"
+          />
+        </div>
+
+        <button
+          type="submit"
+          className="w-full rounded-lg bg-black px-5 py-3 text-sm font-medium text-white transition hover:bg-[#222]"
+        >
+          Create account
+        </button>
+
+        <p className="text-center text-sm text-[#666]">
+          Already have an account?{" "}
+
+          <button
+            type="button"
+            onClick={() => {
+              setShowSignUp(false);
+              setShowSignIn(true);
+            }}
+            className="font-medium text-black underline"
+          >
+            Sign in
+          </button>
+        </p>
+      </form>
+    </div>
   </div>
 )}
 </main>
