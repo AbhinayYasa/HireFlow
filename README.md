@@ -1,36 +1,137 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HireFlow
 
-## Getting Started
+HireFlow is a modern job board application built with Next.js, React, TypeScript, Tailwind CSS, and Supabase.
 
-First, run the development server:
+The platform allows users to browse available job opportunities, view job details, create an account, sign in, and submit job applications through a clean and responsive interface.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Live Demo
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[Open HireFlow](https://hire-flow-pi-roan.vercel.app/)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## GitHub Repository
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+[View HireFlow on GitHub](https://github.com/AbhinayYasa/HireFlow)
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Job Board
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Browse available job opportunities.
+- View job title, company, location, employment type, salary, and required skills.
+- Job information is retrieved from Supabase.
+- Responsive job listing interface.
 
-## Deploy on Vercel
+### Job Details
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Users can select a job to view relevant information before applying.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Job details include:
+
+- Job title
+- Company
+- Location
+- Job type
+- Salary
+- Required skills
+
+### User Authentication
+
+HireFlow uses Supabase Authentication for user sign-in.
+
+Users can:
+
+- Create an account.
+- Sign in using email and password.
+- Sign out.
+- Access the application form after successful authentication.
+
+If a user attempts to apply without being signed in, HireFlow displays the sign-in interface before allowing the application process to continue.
+
+### Job Application
+
+Authenticated users can submit applications for available jobs.
+
+The application form collects:
+
+- Full name
+- Email
+- Phone number
+- Resume
+- LinkedIn profile
+- Cover letter
+
+After a successful submission, HireFlow displays an application confirmation message.
+
+### Application Information
+
+Application records contain information such as:
+
+- Applicant details
+- Job details
+- Company
+- Location
+- Job type
+- Salary
+- Skills
+- Resume
+- LinkedIn profile
+- Cover letter
+- Application status
+
+### Responsive User Experience
+
+The interface is designed with a clean and responsive layout.
+
+The application uses:
+
+- Responsive layouts
+- Job cards
+- Modal dialogs
+- Forms
+- Buttons
+- Responsive grids
+- Clear authentication flows
+- Application confirmation states
+
+---
+
+## Technology Stack
+
+### Frontend
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+
+### Backend and Database
+
+- Supabase
+- Supabase Authentication
+- PostgreSQL
+
+### Development Tools
+
+- Visual Studio Code
+- Git
+- GitHub
+- GitHub Actions
+
+### Deployment
+
+- Vercel
+
+---
+
+## Supabase Integration
+
+Supabase provides the backend services used by HireFlow.
+
+The `jobs` table contains the job opportunities displayed on the job board.
+
+The Supabase browser client is configured in:
+
+```text
+lib/supabase/client.ts
